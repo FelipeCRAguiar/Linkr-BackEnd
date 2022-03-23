@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
-import { connection } from '../database.js';
+import { db } from '../db.js';
 
 export async function createUser(req, res) {
   const user = req.body;
-
+  
   try {
-    const existingUsers = await connection.query(
+    const existingUsers = await db.query(
         `SELECT * 
             FROM users 
             WHERE email=$1 AND username=$2`, [user.email, user.username])
@@ -15,7 +15,7 @@ export async function createUser(req, res) {
 
     const passwordHash = bcrypt.hashSync(user.password, 10);
 
-    await connection.query(`
+    await db.query(`
       INSERT INTO 
         users(email, password, username, picture) 
       VALUES ($1, $2, $3, $4)
