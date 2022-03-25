@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import {v4 as uuid} from 'uuid';
-import db from '../db';
+import db from '../db.js';
 
 export async function createUser(req, res) {
   const user = req.body;
@@ -18,9 +18,9 @@ export async function createUser(req, res) {
 
     await db.query(`
       INSERT INTO 
-        users(email, password, username, picture) 
+        users(email, password, username, image) 
       VALUES ($1, $2, $3, $4)
-    `, [user.email, passwordHash, user.username, user.picture])
+    `, [user.email, passwordHash, user.username, user.image])
 
     res.sendStatus(201);
   } catch (error) {
@@ -40,14 +40,14 @@ export async function signIn(req, res) {
         SELECT *
           FROM users
           WHERE email=$1`, [email])
-  
-      if (user.rowCount !== 0 && bcrypt.compareSync(password, user.password)) {
+          
+      if (user.rowCount !== 0 && bcrypt.compareSync(password, user.rows[0].password)) {
         const token = uuid();
-  
+        
         await db.query(`
           INSERT INTO 
             sessions("userId", token)
-          VALUES ($1, $2)`, [user.rows[0], token])
+          VALUES ($1, $2)`, [user.rows[0].id, token])
   
         let userInfo = { ...user.rows[0], token }
   
