@@ -1,4 +1,8 @@
-import { getPosts, createPost } from "../controllers/postController.js";
+import {
+  getPosts,
+  createPost,
+  deletePost,
+} from "../controllers/postController.js";
 import { Router } from "express";
 import { validateToken } from "../middlewares/validateUserToken.js";
 import { validateSchemaMiddleware } from "../middlewares/validateSchemaMiddleware.js";
@@ -8,10 +12,11 @@ const postRouter = Router();
 
 postRouter.get("/posts", getPosts);
 postRouter.post(
-  "/post",
+  "/posts",
   validateToken,
   validateSchemaMiddleware(postSchema),
   createPost
 );
+postRouter.delete("/posts/:postId", validateToken, deletePost);
 
 export default postRouter;
