@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import {v4 as uuid} from 'uuid';
-import db from '../db';
+import db from '../db.js';
 
 export async function createUser(req, res) {
   const user = req.body;
@@ -18,9 +18,9 @@ export async function createUser(req, res) {
 
     await db.query(`
       INSERT INTO 
-        users(email, password, username, picture) 
+        users(username, email, password, image) 
       VALUES ($1, $2, $3, $4)
-    `, [user.email, passwordHash, user.username, user.picture])
+    `, [user.username, user.email, passwordHash, user.image])
 
     res.sendStatus(201);
   } catch (error) {
