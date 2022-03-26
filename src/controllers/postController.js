@@ -33,7 +33,6 @@ export async function getPosts(req, res) {
 export async function createPost(req, res) {
   const user = res.locals.user;
   const { link, text } = req.body;
-  console.log(user.id);
 
   try {
     const validateUserId = await db.query("SELECT * FROM users WHERE id=$1", [
