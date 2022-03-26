@@ -1,8 +1,17 @@
-import { getPosts } from "../controllers/postController.js";
+import { getPosts, createPost } from "../controllers/postController.js";
 import { Router } from "express";
+import { validateToken } from "../middlewares/validateUserToken.js";
+import { validateSchemaMiddleware } from "../middlewares/validateSchemaMiddleware.js";
+import postSchema from "../schemas/postSchema.js";
 
-const getPostsRouter = Router();
+const postRouter = Router();
 
-getPostsRouter.get("/posts", getPosts);
+postRouter.get("/posts", getPosts);
+postRouter.post(
+  "/post",
+  validateToken,
+  validateSchemaMiddleware(postSchema),
+  createPost
+);
 
-export default getPostsRouter;
+export default postRouter;

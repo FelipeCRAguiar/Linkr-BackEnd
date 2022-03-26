@@ -29,3 +29,27 @@ export async function getPosts(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function createPost(req, res) {
+  const user = res.locals.user;
+  const { link, text } = req.body;
+
+  try {
+    const validateUserId = await db.query("SELECT * FROM users WHERE id=$1", [
+      user.id,
+    ]);
+    if (validateUserId.rowCount <= 0) {
+      return res.sendStatus(404);
+    }
+
+    await db.query(
+      'INSERT INTO posts ("userId", link, text) VALUES ($1, $2, $3)',
+      [user.id, link, text]
+    );
+
+    res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
