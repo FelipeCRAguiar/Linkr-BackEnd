@@ -72,3 +72,27 @@ export async function signIn(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function getUser(req, res) {
+  let userId = req.params.id
+
+  try {
+    const user = await db.query(`
+      SELECT *
+        FROM users
+        WHERE id=$1`, [userId])
+
+    if(user.rowCount === 0) {
+      res.sendStatus(404)
+    }
+
+    let userInfo = {...user.rows[0]}
+
+    delete userInfo.password
+    delete userInfo.email
+
+    res.send(userInfo)
+  } catch {
+    res.sendStatus(500)
+  }
+}
