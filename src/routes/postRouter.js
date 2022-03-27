@@ -2,6 +2,7 @@ import {
   getPosts,
   createPost,
   deletePost,
+  getPostByUser,
 } from "../controllers/postController.js";
 import { Router } from "express";
 import { validateToken } from "../middlewares/validateUserToken.js";
@@ -18,5 +19,6 @@ postRouter.post(
   createPost
 );
 postRouter.delete("/posts/:postId", validateToken, deletePost);
+postRouter.get("/user/:id", validateToken, getPostByUser);
 
 export default postRouter;
