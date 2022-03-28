@@ -96,3 +96,21 @@ export async function getUser(req, res) {
     res.sendStatus(500)
   }
 }
+
+export async function searchUsers(req, res) {
+  let { name } = req.query
+
+  try {
+
+    const userList = await db.query(`
+      SELECT id, username, image
+        FROM users
+        WHERE username ILIKE $1`, [`%${name}%`])
+
+    res.send(userList.rows)
+    
+  } catch (error) {
+    console.log(error)
+    res.sendStatus(500)
+  }
+}
