@@ -2,15 +2,16 @@ import {
   getPosts,
   createPost,
   deletePost,
+  editPost,
   likePost,
   unlikePost,
-  getPostByUser
-
+  getPostByUser,
 } from "../controllers/postController.js";
 import { Router } from "express";
 import { validateToken } from "../middlewares/validateUserToken.js";
 import { validateSchemaMiddleware } from "../middlewares/validateSchemaMiddleware.js";
 import postSchema from "../schemas/postSchema.js";
+import editPostSchema from "../schemas/editPostSchema.js";
 
 const postRouter = Router();
 
@@ -22,6 +23,12 @@ postRouter.post(
   createPost
 );
 postRouter.delete("/posts/:postId", validateToken, deletePost);
+postRouter.patch(
+  "/posts/:postId",
+  validateToken,
+  validateSchemaMiddleware(editPostSchema),
+  editPost
+);
 postRouter.post("/like", likePost);
 postRouter.delete("/unlike/:postId/:userId", unlikePost);
 postRouter.get("/user/:id", validateToken, getPostByUser);
