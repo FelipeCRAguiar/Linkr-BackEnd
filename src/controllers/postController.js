@@ -16,7 +16,18 @@ export async function getPosts(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-      let completePost = { ...postsrows[i], title, linkImage, description };
+      const likesA = await db.query(`SELECT * FROM likes WHERE "postId" = $1`, [
+        postsrows[i].id,
+      ]);
+      const likes = likesA.rows;
+
+      let completePost = {
+        ...postsrows[i],
+        title,
+        linkImage,
+        description,
+        likes,
+      };
 
       postsTimeline.push(completePost);
 
@@ -25,6 +36,34 @@ export async function getPosts(req, res) {
     }
 
     res.status(200).send(postsTimeline);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function likePost(req, res) {
+  const x = req.body;
+
+  try {
+    await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`, [
+      x.userId,
+      x.postId,
+    ]);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function unlikePost(req, res) {
+  const x = req.params;
+
+  try {
+    await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2`, [
+      x.userId,
+      x.postId,
+    ]);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -86,6 +125,76 @@ export async function deletePost(req, res) {
     await db.query(`${query};`, [postId]);
 
     res.sendStatus(204);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function editPost(req, res) {
+  const { postId } = req.params;
+  const { text } = req.body;
+  const user = res.locals.user;
+
+  const validatePostId = await db.query("SELECT * FROM posts WHERE id = $1", [
+    postId,
+  ]);
+  if (validatePostId.rowCount <= 0) {
+    return res.sendStatus(404);
+  }
+
+  const validateUserOwnsPost = validatePostId.rows[0];
+  if (Object.values(validateUserOwnsPost)[1] !== user.id) {
+    return res.sendStatus(403);
+  }
+
+  let query = `
+    UPDATE 
+      posts
+    SET
+      "text" = $1
+  `;
+
+  if (postId) {
+    query += "WHERE posts.id = $2";
+  }
+
+  try {
+    await db.query(`${query};`, [text, postId]);
+
+    res.sendStatus(204);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function getPostByUser(req, res) {
+  const userId = req.params.id;
+
+  try {
+    const posts = await db.query(
+      `SELECT posts.*, users.image, users.username FROM posts JOIN users ON posts."userId" = users.id WHERE posts."userId"=$1 ORDER BY id DESC LIMIT 20`,
+      [userId]
+    );
+    const postsrows = posts.rows;
+    const postsTimeline = [];
+
+    for (let i = 0; i < posts.rowCount; i++) {
+      let metadata = await urlMetadata(postsrows[i].link);
+      const title = metadata.title;
+      const linkImage = metadata.image;
+      const description = metadata.description;
+
+      let completePost = { ...postsrows[i], title, linkImage, description };
+
+      postsTimeline.push(completePost);
+
+      metadata = null;
+      completePost = null;
+    }
+
+    res.status(200).send(postsTimeline);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
