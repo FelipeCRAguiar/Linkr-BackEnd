@@ -3,6 +3,7 @@ import urlMetadata from "url-metadata";
 
 export async function getPosts(req, res) {
   try {
+
     const posts = await db.query(
       `SELECT posts.*, users.image, users.username FROM posts JOIN users ON posts."userId" = users.id ORDER BY id DESC LIMIT 20`
     );
@@ -15,7 +16,12 @@ export async function getPosts(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-      let completePost = { ...postsrows[i], title, linkImage, description };
+      const likesA = await db.query(`SELECT * FROM likes WHERE "postId" = $1`, [postsrows[i].id]);
+      const likes = likesA.rows
+
+      let completePost = { ...postsrows[i], title, linkImage, description, likes};
+
+
 
       postsTimeline.push(completePost);
 
@@ -24,6 +30,36 @@ export async function getPosts(req, res) {
     }
 
     res.status(200).send(postsTimeline);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+
+export async function likePost(req, res) {
+
+  const x = req.body
+
+  try {
+
+    await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`, [x.userId, x.postId])
+
+    
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function unlikePost(req, res) {
+
+  const x = req.params
+
+  try {
+
+    await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2`, [x.userId, x.postId])
+    
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
