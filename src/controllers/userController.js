@@ -6,6 +6,7 @@ export async function createUser(req, res) {
   const user = req.body;
 
   try {
+    console.log(user)
     const existingUsers = await db.query(
       `SELECT * 
             FROM users 
