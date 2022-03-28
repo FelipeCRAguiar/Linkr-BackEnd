@@ -124,3 +124,34 @@ export async function deletePost(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getPostByUser(req, res) {
+  const userId = req.params.id
+
+  try {
+    const posts = await db.query(
+      `SELECT posts.*, users.image, users.username FROM posts JOIN users ON posts."userId" = users.id WHERE posts."userId"=$1 ORDER BY id DESC LIMIT 20`
+    , [userId]);
+    const postsrows = posts.rows;
+    const postsTimeline = [];
+
+    for (let i = 0; i < posts.rowCount; i++) {
+      let metadata = await urlMetadata(postsrows[i].link);
+      const title = metadata.title;
+      const linkImage = metadata.image;
+      const description = metadata.description;
+
+      let completePost = { ...postsrows[i], title, linkImage, description };
+
+      postsTimeline.push(completePost);
+
+      metadata = null;
+      completePost = null;
+    }
+
+    res.status(200).send(postsTimeline);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
