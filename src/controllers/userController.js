@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
+
+import { db } from '../db.js';
+
 import {v4 as uuid} from 'uuid';
-import db from '../db.js';
 
 export async function createUser(req, res) {
   const user = req.body;
-
+  
   try {
     const existingUsers = await db.query(
       `SELECT * 
