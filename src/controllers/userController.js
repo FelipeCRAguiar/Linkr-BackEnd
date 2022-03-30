@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
+
+import { db } from '../db.js';
+
 import {v4 as uuid} from 'uuid';
-import db from '../db.js';
 
 export async function createUser(req, res) {
   const user = req.body;
-
+  
   try {
     console.log(user)
     const existingUsers = await db.query(
@@ -92,6 +94,24 @@ export async function getUser(req, res) {
 
     res.send(userInfo)
   } catch {
+    res.sendStatus(500)
+  }
+}
+
+export async function searchUsers(req, res) {
+  let { name } = req.query
+
+  try {
+
+    const userList = await db.query(`
+      SELECT id, username, image
+        FROM users
+        WHERE username ILIKE $1`, [`%${name}%`])
+
+    res.send(userList.rows)
+    
+  } catch (error) {
+    console.log(error)
     res.sendStatus(500)
   }
 }
