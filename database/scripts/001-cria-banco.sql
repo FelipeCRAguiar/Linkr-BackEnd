@@ -25,6 +25,13 @@ CREATE TABLE "likes" (
   "postId" INTEGER NOT NULL REFERENCES "posts"("id")
 );
 
+CREATE TABLE "comments" (
+  "id" SERIAL PRIMARY KEY,
+  "userId" INTEGER NOT NULL REFERENCES "users"("id"),
+  "postId" INTEGER NOT NULL REFERENCES "posts"("id"),
+  "comment" TEXT NOT NULL
+);
+
 CREATE TABLE "tags" (
   "id" SERIAL PRIMARY KEY,
   "name" TEXT NOT NULL
