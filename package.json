@@ -8,7 +8,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
     "dev": "npx nodemon src/app.js"
-
   },
   "author": "",
   "license": "ISC",

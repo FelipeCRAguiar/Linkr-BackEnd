@@ -1,5 +1,6 @@
 import db from "../db.js";
 import urlMetadata from "url-metadata";
+import { handleHashtag } from "./hashtagController.js";
 
 export async function getPosts(req, res) {
   try {
@@ -85,6 +86,8 @@ export async function createPost(req, res) {
       'INSERT INTO posts ("userId", link, text) VALUES ($1, $2, $3)',
       [user.id, link, text]
     );
+
+    handleHashtag(text);
 
     res.sendStatus(201);
   } catch (error) {
