@@ -68,7 +68,8 @@ export async function signIn(req, res) {
     } else {
       res.sendStatus(401);
     }
-  } catch {
+  } catch (error) {
+    console.log(error)
     res.sendStatus(500);
   }
 }
