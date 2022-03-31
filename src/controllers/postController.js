@@ -186,7 +186,18 @@ export async function getPostByUser(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-      let completePost = { ...postsrows[i], title, linkImage, description };
+      const likesA = await db.query(`SELECT * FROM likes WHERE "postId" = $1`, [
+        postsrows[i].id,
+      ]);
+      const likes = likesA.rows;
+
+      let completePost = {
+        ...postsrows[i],
+        title,
+        linkImage,
+        description,
+        likes,
+      };
 
       postsTimeline.push(completePost);
 
