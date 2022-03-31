@@ -26,3 +26,21 @@ export async function unfollow(req, res) {
     res.sendStatus(500)
   }
 }
+
+export async function getFollow(req, res) {
+  const follow = req.body
+
+  try {
+    const following =  await db.query('SELECT * FROM "followedUsers" WHERE "followerId"=$1 AND "followedId"=$2', [follow.followerId, follow.followedId])
+
+    if(following.rowCount === 0) {
+      res.send(false)
+    } else {
+      res.send(true)
+    }
+    
+  } catch (error) {
+    console.log(error)
+    res.sendStatus(500)
+  }
+}
