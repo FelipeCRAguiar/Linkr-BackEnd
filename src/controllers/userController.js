@@ -7,12 +7,11 @@ export async function createUser(req, res) {
   const user = req.body;
   
   try {
-    console.log(user)
     const existingUsers = await db.query(
       `SELECT * 
             FROM users 
-            WHERE email=$1 AND username=$2`,
-      [user.email, user.username]
+            WHERE email=$1`,
+      [user.email]
     );
     if (existingUsers.rowCount > 0) {
       return res.sendStatus(409);

@@ -16,7 +16,7 @@ import editPostSchema from "../schemas/editPostSchema.js";
 
 const postRouter = Router();
 
-postRouter.get("/posts", getPosts);
+postRouter.get("/posts", validateToken, getPosts);
 postRouter.post(
   "/posts",
   validateToken,
