@@ -21,7 +21,7 @@ export async function getPosts(req, res) {
       const likesA = await db.query(`SELECT likes.*, users.username FROM likes JOIN users ON likes."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
       const likes = likesA.rows
 
-      const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
+      const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
       const comments = commentsA.rows
   
       let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
@@ -68,6 +68,27 @@ export async function unlikePost(req, res) {
     console.log(error);
     return res.sendStatus(500);
   }
+}
+
+export async function commentPost(req, res) {
+
+  const comment = req.body;
+  const {userId, postId} = req.params;
+
+  console.log([userId, postId, comment.comment]);
+
+    try{
+      await db.query(
+      `INSERT INTO comments ("userId", "postId", comment) VALUES ($1, $2, $3)`,
+      [userId, postId, comment.comment] 
+    )
+
+    res.send(200);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+    
 }
 
 export async function createPost(req, res) {
