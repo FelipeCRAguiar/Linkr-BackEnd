@@ -4,7 +4,8 @@ import {
   deletePost,
   likePost,
   unlikePost,
-  getPostByUser
+  getPostByUser,
+  commentPost
 
 } from "../controllers/postController.js";
 import { Router } from "express";
@@ -25,5 +26,6 @@ postRouter.delete("/posts/:postId", validateToken, deletePost);
 postRouter.post("/like/:postId/:userId", likePost);
 postRouter.delete("/unlike/:postId/:userId", unlikePost);
 postRouter.get("/user/:id", validateToken, getPostByUser);
+postRouter.post("/comment/:postId/:userId", commentPost);
 
 export default postRouter;
