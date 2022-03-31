@@ -17,14 +17,13 @@ export async function getPosts(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-
       const likesA = await db.query(`SELECT likes.*, users.username FROM likes JOIN users ON likes."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
       const likes = likesA.rows
 
       const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
       const comments = commentsA.rows
   
-      let completePost = { ...postsrows[i], title, linkImage, description, likes};
+      let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
 
       postsTimeline.push(completePost);
 
@@ -48,6 +47,7 @@ export async function likePost(req, res) {
   try {
     await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`, [x.userId, x.postId])
     
+    res.sendStatus(200)
 
   } catch (error) {
     console.log(error);
@@ -63,6 +63,7 @@ export async function unlikePost(req, res) {
   try {
     await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2`, [x.userId, x.postId])
     
+    res.sendStatus(200)
 
   } catch (error) {
     console.log(error);
