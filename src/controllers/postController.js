@@ -215,7 +215,7 @@ export async function getPostByUser(req, res) {
       const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
       const comments = commentsA.rows
   
-      let completePost = { ...postsrows[i], title, linkImage, description, likes};
+      let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
 
       postsTimeline.push(completePost);
 
