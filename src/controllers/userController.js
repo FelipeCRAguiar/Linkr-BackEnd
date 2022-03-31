@@ -36,7 +36,6 @@ export async function createUser(req, res) {
 
 export async function signIn(req, res) {
   let { email, password } = req.body;
-  console.log("estou tentando logar")
 
   try {
     const user = await db.query(
@@ -46,13 +45,11 @@ export async function signIn(req, res) {
           WHERE email=$1`,
       [email]
     );
-    console.log("procurei pelo usuario")
 
     if (
       user.rowCount !== 0 &&
       bcrypt.compareSync(password, user.rows[0].password)
     ) {
-      console.log("usuario achado e senha corresponde")
       const token = uuid();
 
       await db.query(
@@ -62,19 +59,16 @@ export async function signIn(req, res) {
           VALUES ($1, $2)`,
         [user.rows[0].id, token]
       );
-      console.log("criada a sessão")
 
       let userInfo = { ...user.rows[0], token };
 
       delete userInfo.password;
-      console.log("enviando usuario")
 
       res.send(userInfo);
     } else {
       res.sendStatus(401);
     }
   } catch (error) {
-    console.log("deu merda")
     console.log(error)
     res.sendStatus(500);
   }
