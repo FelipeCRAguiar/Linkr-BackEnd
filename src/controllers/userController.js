@@ -46,6 +46,10 @@ export async function signIn(req, res) {
       [email]
     );
 
+    if (user.rowCount === 0) {
+      return (res.sendStatus(501))
+    }
+
     if (
       user.rowCount !== 0 &&
       bcrypt.compareSync(password, user.rows[0].password)
