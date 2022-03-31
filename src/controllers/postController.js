@@ -4,6 +4,7 @@ import { handleHashtag } from "./hashtagController.js";
 
 export async function getPosts(req, res) {
   try {
+
     const posts = await db.query(
       `SELECT posts.*, users.image, users.username FROM posts JOIN users ON posts."userId" = users.id ORDER BY id DESC LIMIT 20`
     );
@@ -16,18 +17,13 @@ export async function getPosts(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-      const likesA = await db.query(`SELECT * FROM likes WHERE "postId" = $1`, [
-        postsrows[i].id,
-      ]);
-      const likes = likesA.rows;
+      const likesA = await db.query(`SELECT likes.*, users.username FROM likes JOIN users ON likes."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
+      const likes = likesA.rows
 
-      let completePost = {
-        ...postsrows[i],
-        title,
-        linkImage,
-        description,
-        likes,
-      };
+      const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
+      const comments = commentsA.rows
+  
+      let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
 
       postsTimeline.push(completePost);
 
@@ -42,14 +38,17 @@ export async function getPosts(req, res) {
   }
 }
 
+
+
 export async function likePost(req, res) {
-  const x = req.body;
+
+  const x = req.params
 
   try {
-    await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`, [
-      x.userId,
-      x.postId,
-    ]);
+    await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`, [x.userId, x.postId])
+    
+    res.sendStatus(200)
+
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -57,17 +56,40 @@ export async function likePost(req, res) {
 }
 
 export async function unlikePost(req, res) {
-  const x = req.params;
+
+
+  const x = req.params
 
   try {
-    await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2`, [
-      x.userId,
-      x.postId,
-    ]);
+    await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2`, [x.userId, x.postId])
+    
+    res.sendStatus(200)
+
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
   }
+}
+
+export async function commentPost(req, res) {
+
+  const comment = req.body;
+  const {userId, postId} = req.params;
+
+  console.log([userId, postId, comment.comment]);
+
+    try{
+      await db.query(
+      `INSERT INTO comments ("userId", "postId", comment) VALUES ($1, $2, $3)`,
+      [userId, postId, comment.comment] 
+    )
+
+    res.send(200);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+    
 }
 
 export async function createPost(req, res) {
@@ -186,7 +208,14 @@ export async function getPostByUser(req, res) {
       const linkImage = metadata.image;
       const description = metadata.description;
 
-      let completePost = { ...postsrows[i], title, linkImage, description };
+
+      const likesA = await db.query(`SELECT likes.*, users.username FROM likes JOIN users ON likes."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
+      const likes = likesA.rows
+
+      const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
+      const comments = commentsA.rows
+  
+      let completePost = { ...postsrows[i], title, linkImage, description, likes};
 
       postsTimeline.push(completePost);
 
