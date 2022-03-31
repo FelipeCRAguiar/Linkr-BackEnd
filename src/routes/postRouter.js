@@ -6,7 +6,7 @@ import {
   likePost,
   unlikePost,
   getPostByUser,
-  commentPost
+  /*commentPost*/
 } from "../controllers/postController.js";
 import { Router } from "express";
 import { validateToken } from "../middlewares/validateUserToken.js";
