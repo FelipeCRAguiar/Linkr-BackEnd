@@ -17,7 +17,7 @@ CREATE TABLE "posts" (
   "userId" INTEGER NOT NULL REFERENCES "users"("id"),
   "link" TEXT NOT NULL,
   "text" TEXT,
-  "date" TIMESTAMP WITHOUT TIMEZONE NOT NULL DEFAULT NOW()
+  "date" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE "likes" (
@@ -48,18 +48,11 @@ CREATE TABLE "followedUsers" (
   "id" SERIAL PRIMARY KEY,
   "followerId" INTEGER NOT NULL REFERENCES "users"("id"),
   "followedId" INTEGER NOT NULL REFERENCES "users"("id")
-)
+);
 
 CREATE TABLE "sharedPosts" (
   "id" SERIAL PRIMARY KEY,
   "userId" INTEGER NOT NULL REFERENCES "users"("id"),
   "postId" INTEGER NOT NULL REFERENCES "posts"("id"),
-  "date" TIMESTAMP WITHOUT TIMEZONE NOT NULL DEFAULT NOW()
-)
-
-CREATE TABLE "comments" (
-  "id" SERIAL PRIMARY KEY,
-  "userId" INTEGER NOT NULL REFERENCES "users"("id"),
-  "postId" INTEGER NOT NULL REFERENCES "posts"("id"),
-  "comment" TEXT NOT NULL
+  "date" TIMESTAMP NOT NULL DEFAULT NOW()
 );
