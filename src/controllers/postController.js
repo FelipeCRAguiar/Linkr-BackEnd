@@ -21,10 +21,10 @@ export async function getPosts(req, res) {
       const likesA = await db.query(`SELECT likes.*, users.username FROM likes JOIN users ON likes."userId" = users.id WHERE "postId" = $1`, [postsrows[i].id]);
       const likes = likesA.rows
 
-      const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
-      const comments = commentsA.rows
+      /*const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
+      const comments = commentsA.rows  */
   
-      let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
+      let completePost = { ...postsrows[i], title, linkImage, description, likes};
 
       postsTimeline.push(completePost);
 
@@ -70,7 +70,7 @@ export async function unlikePost(req, res) {
   }
 }
 
-export async function commentPost(req, res) {
+/*export async function commentPost(req, res) {
 
   const comment = req.body;
   const {userId, postId} = req.params;
@@ -89,7 +89,7 @@ export async function commentPost(req, res) {
     return res.sendStatus(500);
   }
     
-}
+} */
 
 export async function createPost(req, res) {
   const user = res.locals.user;
