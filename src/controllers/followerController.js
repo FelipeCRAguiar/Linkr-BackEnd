@@ -1,4 +1,4 @@
-/*import db from "../db.js";
+import db from "../db.js";
 
 export async function follow(req, res) {
   const follow = req.body
@@ -25,4 +25,4 @@ export async function unfollow(req, res) {
     console.log(error)
     res.sendStatus(500)
   }
-} */
+}

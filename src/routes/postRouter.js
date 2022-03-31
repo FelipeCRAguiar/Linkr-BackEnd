@@ -6,7 +6,7 @@ import {
   likePost,
   unlikePost,
   getPostByUser,
-  /*commentPost*/
+  commentPost
 } from "../controllers/postController.js";
 import { Router } from "express";
 import { validateToken } from "../middlewares/validateUserToken.js";
@@ -34,6 +34,6 @@ postRouter.patch(
 );
 postRouter.delete("/unlike/:postId/:userId", unlikePost);
 postRouter.get("/user/:id", validateToken, getPostByUser);
-/*postRouter.post("/comment/:postId/:userId", commentPost); */
+postRouter.post("/comment/:postId/:userId", commentPost);
 
 export default postRouter;
