@@ -19,10 +19,9 @@ export async function handleHashtag(post) {
 export async function getTags(req, res){
     try{
         const tags = await db.query(`
-            SELECT id, name, COUNT(name) AS posicao FROM tags GROUP BY name ORDER BY posicao DESC
+            SELECT name, COUNT(name) AS posicao FROM tags GROUP BY name ORDER BY posicao DESC
         `)
         
-
         res.status(200).send(tags.rows);
     }catch(error) {
         console.log(error);

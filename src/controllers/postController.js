@@ -3,10 +3,26 @@ import urlMetadata from "url-metadata";
 import { handleHashtag } from "./hashtagController.js";
 
 export async function getPosts(req, res) {
+  const user = res.locals.user;
+
   try {
 
+    const followeds = await db.query(`
+      SELECT * FROM "followedUsers" WHERE "followerId" = $1
+    `, [user.id]);
+
+    if (followeds.rowCount <= 0){
+      return res.sendStatus(204);
+    }
+
+    
+
     const posts = await db.query(
-      `SELECT posts.*, users.image, users.username FROM posts JOIN users ON posts."userId" = users.id ORDER BY id DESC LIMIT 20`
+      `SELECT posts.*, users.image, users.username 
+        FROM posts  
+        JOIN users ON posts."userId" = users.id 
+        WHERE users.id IN (SELECT "followedId" FROM  "followedUsers" WHERE "followerId" = $1)
+        ORDER BY id DESC LIMIT 20`, [user.id]
     );
     const postsrows = posts.rows;
     const postsTimeline = [];
@@ -215,7 +231,7 @@ export async function getPostByUser(req, res) {
       const commentsA = await db.query(`SELECT comments.*, users.username, users.image FROM comments JOIN users ON comments."userId" = users.id WHERE "postId" = $1 ORDER BY id ASC`, [postsrows[i].id]);
       const comments = commentsA.rows
   
-      let completePost = { ...postsrows[i], title, linkImage, description, likes, comments};
+      let completePost = { ...postsrows[i], title, linkImage, description, likes};
 
       postsTimeline.push(completePost);
 
