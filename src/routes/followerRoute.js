@@ -6,6 +6,6 @@ const followerRouter = Router();
 
 followerRouter.post("/follow", validateToken, follow);
 followerRouter.delete("/unfollow", validateToken, unfollow);
-followerRouter.get("/isfollowing", validateToken, getFollow)
+followerRouter.get("/isfollowing/:userId/:id", validateToken, getFollow)
 
 export default followerRouter
