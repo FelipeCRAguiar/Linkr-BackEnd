@@ -108,7 +108,7 @@ export async function searchUsers(req, res) {
         FROM users
         JOIN "followedUsers" ON "followedUsers"."followerId"=$1
         JOIN users u ON u.id="followedUsers"."followedId"
-        WHERE u.username ILIKE $2 AND user.id=$3`, [userId, `%${name}%`, userId])
+        WHERE u.username ILIKE $2 AND users.id=$3`, [userId, `%${name}%`, userId])
 
     const userList = await db.query(`
       SELECT id, username, image
