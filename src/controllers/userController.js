@@ -100,15 +100,39 @@ export async function getUser(req, res) {
 
 export async function searchUsers(req, res) {
   let { name } = req.query
+  let { userId } = req.body
+  let finalList = []
 
   try {
+    const followedUserList = await db.query(`
+      SELECT u.id AS id, u.username AS username, u.image AS image
+        FROM users
+        JOIN "followedUsers" ON "followedUsers"."followerId"=$1
+        JOIN users u ON u.id="followedUsers"."followedId"
+        WHERE u.username ILIKE $2`, [userId, `%${name}%`])
 
     const userList = await db.query(`
       SELECT id, username, image
         FROM users
         WHERE username ILIKE $1`, [`%${name}%`])
 
-    res.send(userList.rows)
+    for (let i = 0; i < followedUserList.rows.length; i++) {
+      finalList.push({...followedUserList.rows[i], followed: true})
+    }
+
+    for (let o = 0; o < userList.rows.length; o++) {
+      let condition = false
+      for (let p = 0; p < finalList.length; p++) {
+        if (finalList[p].id === userList.rows[o].id) {
+          condition = true
+        }
+      }
+      if (condition === false) {
+        finalList.push({...userList.rows[o], followed: false})
+      }
+    }
+
+    res.send(finalList)
     
   } catch (error) {
     console.log(error)
