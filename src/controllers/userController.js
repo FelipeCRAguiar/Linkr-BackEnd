@@ -99,7 +99,7 @@ export async function getUser(req, res) {
 
 export async function searchUsers(req, res) {
   let { name } = req.query
-  let { userId } = req.body
+  let userId = req.params.id
   let finalList = []
 
   try {

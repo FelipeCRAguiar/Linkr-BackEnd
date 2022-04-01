@@ -10,6 +10,6 @@ const userRouter = Router();
 userRouter.post('/sign-up', validateSchemaMiddleware(userSchema), createUser);
 userRouter.post('/login', validateSchemaMiddleware(loginSchema), signIn);
 userRouter.get('/users/:id', validateToken, getUser);
-userRouter.get('/username', validateToken, searchUsers);
+userRouter.get('/username/:id', validateToken, searchUsers);
 
 export default userRouter;
